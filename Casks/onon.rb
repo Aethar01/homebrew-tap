@@ -1,9 +1,9 @@
 cask "onon" do
   arch arm: "arm64", intel: "amd64"
 
-  version "0.13.3"
-  sha256 arm:   "cfd1d25df5cb550f1b4cf871e0e6ed1b4f7402162d238e94df0ca8152e6646cf",
-         intel: "2ebd7a567956c3461940ca13baf88967f736c61fffdd3d9d3f9808cfdf658fba"
+  version "0.13.4"
+  sha256 arm:   "8a5b48dfe351fe74bf10396e544600f18fb6d1c19ee04652cd98a7bb8d6e9fe7",
+         intel: "24dcb3e3633db1828a8212511ac357d3c02610589a48f6cda73371d103e4d1e3"
 
   url "https://github.com/Aethar01/onon/releases/download/#{version}/onon-#{version}-darwin-#{arch}.dmg"
   name "onon"
