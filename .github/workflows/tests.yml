@@ -36,6 +36,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-15-intel, macos-26]
+        formula: [faster, roke]
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -46,13 +47,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Audit formula
-        run: brew audit --formula --strict aethar01/tap/faster
+        run: brew audit --formula --strict aethar01/tap/${{ matrix.formula }}
 
       - name: Install formula
-        run: brew install --build-from-source aethar01/tap/faster
+        run: brew install --build-from-source aethar01/tap/${{ matrix.formula }}
 
       - name: Test formula
-        run: brew test aethar01/tap/faster
+        run: brew test aethar01/tap/${{ matrix.formula }}
 
       - name: Uninstall formula
-        run: brew uninstall aethar01/tap/faster
+        run: brew uninstall aethar01/tap/${{ matrix.formula }}

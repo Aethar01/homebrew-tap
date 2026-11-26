@@ -1,0 +1,89 @@
+name: Update roke formula
+
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - roke-release
+
+concurrency:
+  group: update-roke
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.latest.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compare the formula with the latest release
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest="$(gh api repos/Aethar01/roke/releases/latest --jq .tag_name)"
+          current="$(sed -n 's|^  url "https://github.com/Aethar01/roke/archive/refs/tags/\(.*\)\.tar\.gz"$|\1|p' Formula/roke.rb)"
+          echo "Formula is at ${current}, latest release is ${latest}"
+          if [ -n "$latest" ] && [ "$latest" != "$current" ]; then
+            echo "tag=${latest}" >> "$GITHUB_OUTPUT"
+          fi
+
+  update:
+    needs: check
+    if: needs.check.outputs.tag != ''
+    runs-on: macos-26
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.check.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Update url and checksum
+        run: |
+          tarball_url="https://github.com/Aethar01/roke/archive/refs/tags/${TAG}.tar.gz"
+          sha="$(curl -fsSL "$tarball_url" | shasum -a 256 | awk '{ print $1 }')"
+          if [ -z "$sha" ]; then
+            echo "Failed to compute sha256 for ${tarball_url}" >&2
+            exit 1
+          fi
+
+          sed -i '' -E \
+            -e "s|^  url \".*\"$|  url \"${tarball_url}\"|" \
+            -e "s|^  sha256 \"[0-9a-f]{64}\"$|  sha256 \"${sha}\"|" \
+            Formula/roke.rb
+          git diff
+
+      - name: Audit formula
+        run: brew audit --formula --strict aethar01/tap/roke
+
+      - name: Install formula
+        run: brew install --build-from-source aethar01/tap/roke
+
+      - name: Test formula
+        run: brew test aethar01/tap/roke
+
+      - name: Uninstall formula
+        run: brew uninstall aethar01/tap/roke
+
+      - name: Push the update
+        run: |
+          git commit -am "Update roke to ${TAG}"
+          git push origin HEAD:main

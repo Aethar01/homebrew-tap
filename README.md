@@ -38,12 +38,24 @@ In a `Brewfile`:
 brew "aethar01/tap/faster"
 ```
 
+Install roke (built from source with Rust):
+
+```sh
+brew install aethar01/tap/roke
+```
+
+In a `Brewfile`:
+
+```ruby
+brew "aethar01/tap/roke"
+```
+
 ## Updates
 
-`.github/workflows/update.yml` checks for a new onon release every hour, or
-straight away when the onon release workflow dispatches `onon-release`. It
-updates the version and checksums, audits and test-installs the cask, then
-pushes to `main`.
+- `.github/workflows/update.yml` checks for a new onon release every hour, or straight away when the onon release workflow triggers it.
+- `.github/workflows/update-roke.yml` checks for a new roke release every hour, or straight away when the roke release workflow triggers it.
+
+Both update versions and checksums, audit and test-install, then push to `main`.
 
 ## Documentation
 
