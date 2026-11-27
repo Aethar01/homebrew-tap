@@ -1,8 +1,8 @@
 class Roke < Formula
   desc "Quiet todo list and Kanban board for the terminal"
   homepage "https://github.com/Aethar01/roke"
-  url "https://github.com/Aethar01/roke/archive/refs/tags/v0.3.0.tar.gz"
-  sha256 "1712545d0c608db13bddad67fe8b27e5f04cd7f0cfa09e8203abffdd723222f3"
+  url "https://github.com/Aethar01/roke/archive/refs/tags/v0.4.0.tar.gz"
+  sha256 "e32d4a36e011e9dc81ca8d98ede83f6cd33af6e28a6ecec98c9d49f9faea6d81"
 
   depends_on "rust" => :build
 
